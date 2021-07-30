@@ -10,7 +10,7 @@ var score1 = 0, score2 =0;
 var paddle1Y;
 
 var  playerscore =0;
-var audio1;
+
 var pcscore =0;
 //ball x and y and speedx speed y and radius
 var ball = {
@@ -27,16 +27,21 @@ scoreRightWrist = 0;
 
 game_status = "";
 
+ function preload() {
+  ball_touch_paddel = loadSound("ball_touch_paddel.wav");
+  missed = loadSound("missed.wav");
+}
+
 function setup(){
-  var canvas =  createCanvas(700,600);
-  canvas.parent('canvas');
+var canvas =  createCanvas(700,600);
+canvas.parent('canvas');
 
-  video = createCapture(VIDEO);
-  video.size(700, 600);
-  video.hide();
+video = createCapture(VIDEO);
+video.size(700, 600);
+video.hide();
 
-  poseNet = ml5.poseNet(video, modelLoaded);
-  poseNet.on('pose', gotPoses);
+poseNet = ml5.poseNet(video, modelLoaded);
+poseNet.on('pose', gotPoses);
 }
 
 function modelLoaded() {
@@ -63,25 +68,25 @@ function startGame()
 
 function draw(){
 
- background(0); 
- image(video, 0, 0, 700, 600);
+  background(0); 
+  image(video, 0, 0, 700, 600);
 
- fill("black");
- stroke("black");
- rect(680,0,20,700);
+  fill("black");
+  stroke("black");
+  rect(680,0,20,700);
 
- fill("black");
- stroke("black");
- rect(0,0,20,700);
- 
-    if(scoreRightWrist > 0.2)
+  fill("black");
+  stroke("black");
+  rect(0,0,20,700);
+
+  if(scoreRightWrist > 0.2)
   {
     fill("red");
     stroke("red");
     circle(rightWristX, rightWristY, 30);
   }
-    
-   if(game_status == "start")
+
+  if(game_status == "start")
   {
     document.getElementById("status").innerHTML = "Game Is Loaded";
     //funtion paddleInCanvas call 
@@ -117,13 +122,13 @@ function draw(){
   }
 
 
+
 //function reset when ball does notcame in the contact of padde
 function reset(){
    ball.x = width/2+100,
    ball.y = height/2+100;
    ball.dx=3;
-   ball.dy =3;
-   
+   ball.dy =3;   
 }
 
 
@@ -165,9 +170,11 @@ function move(){
   if (ball.x-2.5*ball.r/2< 0){
   if (ball.y >= paddle1Y&& ball.y <= paddle1Y + paddle1Height) {
     ball.dx = -ball.dx+0.5; 
+    ball_touch_paddel.play();
   }
   else{
     pcscore++;
+    missed.play();
     reset();
     navigator.vibrate(100);
   }
@@ -178,9 +185,9 @@ if(pcscore ==4){
     rect(0,0,width,height-1);
     fill("white");
     stroke("white");
-    textSize(25)
-    text("Game Over!☹☹",width/2,height/2);
-    text("Reload The Page!",width/2,height/2+30)
+    textSize(25);
+    text("Game Over!",width/2,height/2);
+    text("Press Restart button to play again!",width/2,height/2+30)
     noLoop();
     pcscore = 0;
 }
@@ -208,5 +215,13 @@ function paddleInCanvas(){
   }
   if(mouseY < 0){
     mouseY =0;
-  }  
+  }
+ 
+  
+}
+
+function restart()
+{
+  pcscore = 0;
+  loop();
 }
